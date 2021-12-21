@@ -1,7 +1,0 @@
-[
-{
-  "directory": "/Users/jbstuede/Documents/Raymarch/build",
-  "command": "/usr/bin/clang++   -g -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.1.sdk -o CMakeFiles/raymarch.dir/src/main.cpp.o -c /Users/jbstuede/Documents/Raymarch/src/main.cpp",
-  "file": "/Users/jbstuede/Documents/Raymarch/src/main.cpp"
-}
-]
