@@ -1,0 +1,10 @@
+camera {
+    position: <0, 0, 0>;
+    up: <0, 0, 1>;
+    forward: <0, 1, 0>;
+    fov: 110.0;
+}
+box {
+    bottom_left: <-5, 10, -5>;
+    top_right: <5, 15, 5>;
+}
