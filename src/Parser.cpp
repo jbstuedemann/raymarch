@@ -4,7 +4,7 @@
 #include <iostream>
 #include <cctype>
 #include "Camera.hpp"
-#include "Box.hpp"
+#include "Sphere.hpp"
 
 Parser::Parser(std::string filename) {
     std::ifstream inputFile;
@@ -46,9 +46,9 @@ void Parser::parseFileData() {
                     std::cout << "Found a Camera -> Exctracting data:" << std::endl;
                     lastObject = CAMERA;
                 }
-                else if (identifier == "box") {
-                    std::cout << "Found a Box -> Exctracting data:" << std::endl;
-                    lastObject = BOX;
+                else if (identifier == "sphere") {
+                    std::cout << "Found a Sphere -> Exctracting data:" << std::endl;
+                    lastObject = SPHERE;
                 }
                 else {
                     lastObject = NONE;
@@ -63,7 +63,7 @@ void Parser::parseFileData() {
                         //TODO: add to world
                         parseCamera(data);
                         break;
-                    case BOX:
+                    case SPHERE:
                         //TODO: add to world
                         parseBox(data);
                         break;
@@ -113,7 +113,6 @@ Camera* Parser::parseCamera(std::string data) {
                 std::string propertyData = data.substr(i-segmentCount, segmentCount);
                 std::cout << "\t\t" << propertyData << std::endl;
                 switch (lastProperty) {
-                    //Parse Properties
                     case Camera::POSITION:
                         outCamera->setPosition(parseVector(propertyData));
                         break;
@@ -139,24 +138,24 @@ Camera* Parser::parseCamera(std::string data) {
     return outCamera;
 }
 
-Box* Parser::parseBox(std::string data) {
-    Box* outBox = new Box();
+Sphere* Parser::parseBox(std::string data) {
+    Sphere* outSphere = new Sphere();
     int segmentCount = 0;
-    Box::BOX_PROPERTIES lastProperty = Box::NONE;
+    Sphere::SPHERE_PROPERTIES lastProperty = Sphere::NONE;
     for (int i = 0; i < data.size(); i++) {
         switch (data[i]) {
             case ':': {
                 std::string identifier = data.substr(i-segmentCount, segmentCount);
-                if (identifier == "bottom_left") {
-                    std::cout << "\tfound bottom_left:" << std::endl;
-                    lastProperty = Box::BOTTOM_LEFT;
+                if (identifier == "center") {
+                    std::cout << "\tfound center:" << std::endl;
+                    lastProperty = Sphere::CENTER;
                 }
-                else if (identifier == "top_right") {
-                    std::cout << "\tfound top_right:" << std::endl;
-                    lastProperty = Box::TOP_RIGHT;
+                else if (identifier == "radius") {
+                    std::cout << "\tfound radius:" << std::endl;
+                    lastProperty = Sphere::RADIUS;
                 }
                 else {
-                    lastProperty = Box::NONE;
+                    lastProperty = Sphere::NONE;
                 }
                 segmentCount = 0;
                 break;
@@ -165,15 +164,14 @@ Box* Parser::parseBox(std::string data) {
                 std::string propertyData = data.substr(i-segmentCount, segmentCount);
                 std::cout << "\t\t" << propertyData << std::endl;
                 switch (lastProperty) {
-                    //Parse Properties
-                    case Box::BOTTOM_LEFT:
-                        outBox->setBottomLeft(parseVector(propertyData));
+                    case Sphere::CENTER:
+                        outSphere->setCenter(parseVector(propertyData));
                         break;
-                    case Box::TOP_RIGHT:
-                        outBox->setTopRight(parseVector(propertyData));
+                    case Sphere::RADIUS:
+                        outSphere->setRadius(parseDouble(propertyData));
                         break;
                 }
-                lastProperty = Box::NONE;
+                lastProperty = Sphere::NONE;
                 segmentCount = 0;
                 break;
             }
@@ -182,7 +180,7 @@ Box* Parser::parseBox(std::string data) {
             }
         }
     }
-    return outBox;
+    return outSphere;
 }
 
 glm::dvec3 Parser::parseVector(std::string data) {
