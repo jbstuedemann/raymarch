@@ -2,6 +2,7 @@
 #define PARSER_H
 
 #include "Camera.hpp"
+#include "Box.hpp"
 #include <string>
 #include <glm/glm.hpp>
 
@@ -32,7 +33,7 @@ private:
 
     //Object Parsing
     Camera* parseCamera(std::string data);
-    int parseBox(std::string data);
+    Box* parseBox(std::string data);
 
     //Property Parsing
     glm::dvec3 parseVector(std::string data);

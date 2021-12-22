@@ -8,6 +8,7 @@ add_executable(raymarch
     ${CMAKE_SOURCE_DIR}/src/main.cpp
     ${CMAKE_SOURCE_DIR}/src/Parser.cpp
     ${CMAKE_SOURCE_DIR}/src/Camera.cpp
+    ${CMAKE_SOURCE_DIR}/src/Box.cpp
 )
 
 target_include_directories(raymarch PRIVATE

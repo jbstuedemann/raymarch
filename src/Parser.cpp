@@ -4,6 +4,7 @@
 #include <iostream>
 #include <cctype>
 #include "Camera.hpp"
+#include "Box.hpp"
 
 Parser::Parser(std::string filename) {
     std::ifstream inputFile;
@@ -138,8 +139,50 @@ Camera* Parser::parseCamera(std::string data) {
     return outCamera;
 }
 
-int Parser::parseBox(std::string data) {
-    return 1;
+Box* Parser::parseBox(std::string data) {
+    Box* outBox = new Box();
+    int segmentCount = 0;
+    Box::BOX_PROPERTIES lastProperty = Box::NONE;
+    for (int i = 0; i < data.size(); i++) {
+        switch (data[i]) {
+            case ':': {
+                std::string identifier = data.substr(i-segmentCount, segmentCount);
+                if (identifier == "bottom_left") {
+                    std::cout << "\tfound bottom_left:" << std::endl;
+                    lastProperty = Box::BOTTOM_LEFT;
+                }
+                else if (identifier == "top_right") {
+                    std::cout << "\tfound top_right:" << std::endl;
+                    lastProperty = Box::TOP_RIGHT;
+                }
+                else {
+                    lastProperty = Box::NONE;
+                }
+                segmentCount = 0;
+                break;
+            }
+            case ';': {
+                std::string propertyData = data.substr(i-segmentCount, segmentCount);
+                std::cout << "\t\t" << propertyData << std::endl;
+                switch (lastProperty) {
+                    //Parse Properties
+                    case Box::BOTTOM_LEFT:
+                        outBox->setBottomLeft(parseVector(propertyData));
+                        break;
+                    case Box::TOP_RIGHT:
+                        outBox->setTopRight(parseVector(propertyData));
+                        break;
+                }
+                lastProperty = Box::NONE;
+                segmentCount = 0;
+                break;
+            }
+            default: {
+                segmentCount++;
+            }
+        }
+    }
+    return outBox;
 }
 
 glm::dvec3 Parser::parseVector(std::string data) {
