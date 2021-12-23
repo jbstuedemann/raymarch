@@ -3,6 +3,7 @@
 
 #include "Camera.hpp"
 #include "Sphere.hpp"
+#include "World.hpp"
 #include <string>
 #include <glm/glm.hpp>
 
@@ -24,8 +25,11 @@ class Parser {
 public:
     Parser(std::string filename);
 
+    World* getWorld() { return world; }
+
 private:
     std::string filedata;
+    World* world;
 
     //File Parsing
     void parseLine(std::string line);
@@ -33,7 +37,7 @@ private:
 
     //Object Parsing
     Camera* parseCamera(std::string data);
-    Sphere* parseBox(std::string data);
+    Sphere* parseSphere(std::string data);
 
     //Property Parsing
     glm::dvec3 parseVector(std::string data);

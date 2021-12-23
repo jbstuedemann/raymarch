@@ -11,12 +11,18 @@ Parser::Parser(std::string filename) {
     inputFile.open(filename);
 
     if (inputFile) {
+
+        std::cout << "Loading World..." << std::endl << std::endl;
+        world = new World();
+
         std::string line;
         while (getline(inputFile, line)) {
             parseLine(line);
         }
         
         parseFileData();
+
+        std::cout << std::endl << "Parsing done" << std::endl;
 
         inputFile.close();
     }
@@ -43,11 +49,11 @@ void Parser::parseFileData() {
             case '{': {
                 std::string identifier = filedata.substr(i-segmentCount, segmentCount);
                 if (identifier == "camera") {
-                    std::cout << "Found a Camera -> Exctracting data:" << std::endl;
+                    std::cout << "Camera:" << std::endl;
                     lastObject = CAMERA;
                 }
                 else if (identifier == "sphere") {
-                    std::cout << "Found a Sphere -> Exctracting data:" << std::endl;
+                    std::cout << "Sphere:" << std::endl;
                     lastObject = SPHERE;
                 }
                 else {
@@ -60,12 +66,10 @@ void Parser::parseFileData() {
                 std::string data = filedata.substr(i-segmentCount, segmentCount);
                 switch (lastObject) {
                     case CAMERA:
-                        //TODO: add to world
-                        parseCamera(data);
+                        world->setCamera(parseCamera(data));
                         break;
                     case SPHERE:
-                        //TODO: add to world
-                        parseBox(data);
+                        world->addObject(parseSphere(data));
                         break;
                 }
                 lastObject = NONE;
@@ -88,19 +92,19 @@ Camera* Parser::parseCamera(std::string data) {
             case ':': {
                 std::string identifier = data.substr(i-segmentCount, segmentCount);
                 if (identifier == "position") {
-                    std::cout << "\tfound position:" << std::endl;
+                    std::cout << "\tposition -> " << std::endl;
                     lastProperty = Camera::POSITION;
                 }
                 else if (identifier == "up") {
-                    std::cout << "\tfound up:" << std::endl;
+                    std::cout << "\tup -> " << std::endl;
                     lastProperty = Camera::UP;
                 }
                 else if (identifier == "forward") {
-                    std::cout << "\tfound forward:" << std::endl;
+                    std::cout << "\tforward -> " << std::endl;
                     lastProperty = Camera::FORWARD;
                 }
                 else if (identifier == "fov") {
-                    std::cout << "\tfound fov:" << std::endl;
+                    std::cout << "\tfov # " << std::endl;
                     lastProperty = Camera::FOV;
                 }
                 else {
@@ -138,7 +142,7 @@ Camera* Parser::parseCamera(std::string data) {
     return outCamera;
 }
 
-Sphere* Parser::parseBox(std::string data) {
+Sphere* Parser::parseSphere(std::string data) {
     Sphere* outSphere = new Sphere();
     int segmentCount = 0;
     Sphere::SPHERE_PROPERTIES lastProperty = Sphere::NONE;
@@ -147,11 +151,11 @@ Sphere* Parser::parseBox(std::string data) {
             case ':': {
                 std::string identifier = data.substr(i-segmentCount, segmentCount);
                 if (identifier == "center") {
-                    std::cout << "\tfound center:" << std::endl;
+                    std::cout << "\tcenter -> " << std::endl;
                     lastProperty = Sphere::CENTER;
                 }
                 else if (identifier == "radius") {
-                    std::cout << "\tfound radius:" << std::endl;
+                    std::cout << "\tradius # " << std::endl;
                     lastProperty = Sphere::RADIUS;
                 }
                 else {

@@ -29,6 +29,10 @@ public:
         radius = newRadius;
     }
 
+    double distanceTo(glm::dvec3 position) {
+        return glm::distance(position, center) - radius;
+    }
+
 private:
     glm::dvec3 center;
     double radius;
