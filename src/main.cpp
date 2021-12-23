@@ -3,6 +3,11 @@
 #include "World.hpp"
 #include "Ray.hpp"
 
+#include "DirectionalLight.hpp"
+
+const int PIXEL_WIDTH = 1920;
+const int PIXEL_HEIGHT = 1080;
+
 using namespace std;
 
 int main(int argc, char* argv[]) {
@@ -17,16 +22,30 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    World* world = parser->getWorld();
-    for (int xPixel = 0; xPixel < 1920; xPixel++) {
-        for (int yPixel = 0; yPixel < 1080; yPixel++) {
-            double u = xPixel/1920.;
-            double v = yPixel/1080.;
 
+    World* world = parser->getWorld();
+    world->addLight(new DirectionalLight(glm::dvec3(0, 0, -1), glm::dvec3(1, 1, 1)));
+    uint8_t packed_pixels [PIXEL_WIDTH * PIXEL_HEIGHT * 3];
+
+    for (int xPixel = 0; xPixel < PIXEL_WIDTH; xPixel++) {
+        for (int yPixel = 0; yPixel < PIXEL_HEIGHT; yPixel++) {
+            //Get U,V coords
+            double u = xPixel/(float)PIXEL_WIDTH;
+            double v = yPixel/(float)PIXEL_HEIGHT;
+
+            //Cast Ray, and get shading
             Ray ray = world->getCamera()->getRayForUV(u, v);
             world->castRay(ray);
-            if (ray.time != 0)
-                std::cout << ray.time << std::endl;
+            glm::dvec3 color = glm::dvec3(0, 0, 0);
+            if (ray.objectHit) {
+                glm::dvec3 intersectPos = ray.intersectPos();
+                color = world->getShading(ray.objectHit, intersectPos);
+            }
+
+            int pixelIndex = xPixel*PIXEL_HEIGHT + yPixel;
+            packed_pixels[pixelIndex] = (uint8_t)(color.x * 255);
+            packed_pixels[pixelIndex+1] = (uint8_t)(color.y * 255);
+            packed_pixels[pixelIndex+2] = (uint8_t)(color.z * 255);
 
             //use this ray to find light and shadows
             //then calculate a color

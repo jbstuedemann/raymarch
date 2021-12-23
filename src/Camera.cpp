@@ -8,5 +8,5 @@ Ray Camera::getRayForUV(double u, double v) {
 
     glm::dvec3 direction = forward + (xFactor*xMax*right) + (yFactor*yMax*up);
 
-    return Ray{position, direction, 0.};
+    return Ray{position, direction, 0};
 }

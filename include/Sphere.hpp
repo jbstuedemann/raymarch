@@ -2,8 +2,9 @@
 #define SPHERE_HPP
 
 #include <glm/glm.hpp>
+#include "Object.hpp"
 
-class Sphere {
+class Sphere : public Object {
 public:
     enum SPHERE_PROPERTIES {
         NONE,
@@ -14,9 +15,9 @@ public:
     Sphere(
         glm::dvec3 center,
         double radius
-    ):center(center),radius(radius){};
+    ):Object(),center(center),radius(radius){};
 
-    Sphere(){
+    Sphere():Object(){
         center = glm::dvec3(0, 0, 0);
         radius = 1;
     };
@@ -31,6 +32,10 @@ public:
 
     double distanceTo(glm::dvec3 position) {
         return glm::distance(position, center) - radius;
+    }
+
+    glm::dvec3 getSurfaceNormal(glm::dvec3 intersection) {
+        return glm::normalize(intersection - center);
     }
 
 private:

@@ -8,7 +8,6 @@ add_executable(raymarch
     ${CMAKE_SOURCE_DIR}/src/main.cpp
     ${CMAKE_SOURCE_DIR}/src/Parser.cpp
     ${CMAKE_SOURCE_DIR}/src/Camera.cpp
-    ${CMAKE_SOURCE_DIR}/src/Sphere.cpp
     ${CMAKE_SOURCE_DIR}/src/World.cpp
 )
 

@@ -5,6 +5,7 @@
 #include <cctype>
 #include "Camera.hpp"
 #include "Sphere.hpp"
+#include "Object.hpp"
 
 Parser::Parser(std::string filename) {
     std::ifstream inputFile;
@@ -69,7 +70,7 @@ void Parser::parseFileData() {
                         world->setCamera(parseCamera(data));
                         break;
                     case SPHERE:
-                        world->addObject(parseSphere(data));
+                        world->addObject((Object*)parseSphere(data));
                         break;
                 }
                 lastObject = NONE;
