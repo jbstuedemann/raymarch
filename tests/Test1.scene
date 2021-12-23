@@ -2,9 +2,13 @@ camera {
     position: <0, 0, 0>;
     up: <0, 0, 1>;
     forward: <0, 1, 0>;
-    fov: 110.0;
+    fov: 90.0;
 }
 sphere {
     center: <0, 10, 0>;
-    radius: 5;
+    radius: 1;
+}
+sphere {
+    center: <5, 10, 0>;
+    radius: 1;
 }

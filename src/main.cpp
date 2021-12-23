@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include "Parser.hpp"
 #include "World.hpp"
 #include "Ray.hpp"
@@ -24,7 +25,7 @@ int main(int argc, char* argv[]) {
 
 
     World* world = parser->getWorld();
-    world->addLight(new DirectionalLight(glm::dvec3(0, 0, -1), glm::dvec3(1, 1, 1)));
+    world->addLight(new DirectionalLight(glm::dvec3(0, 1, -1), glm::dvec3(1, 0, 1)));
     uint8_t packed_pixels [PIXEL_WIDTH * PIXEL_HEIGHT * 3];
 
     for (int xPixel = 0; xPixel < PIXEL_WIDTH; xPixel++) {
@@ -42,7 +43,8 @@ int main(int argc, char* argv[]) {
                 color = world->getShading(ray.objectHit, intersectPos);
             }
 
-            int pixelIndex = xPixel*PIXEL_HEIGHT + yPixel;
+            //int pixelIndex = xPixel*PIXEL_HEIGHT + yPixel;
+            int pixelIndex = ((PIXEL_HEIGHT-yPixel-1)*PIXEL_WIDTH + xPixel)*3;
             packed_pixels[pixelIndex] = (uint8_t)(color.x * 255);
             packed_pixels[pixelIndex+1] = (uint8_t)(color.y * 255);
             packed_pixels[pixelIndex+2] = (uint8_t)(color.z * 255);
@@ -52,6 +54,14 @@ int main(int argc, char* argv[]) {
             //then assign it to an image
         }
     }
+
+    std::ofstream imageFile;
+    imageFile.open("../Test1.ppm");
+    imageFile << "P3\n" << PIXEL_WIDTH << '\t' << PIXEL_HEIGHT << '\t' << 255 << '\n';
+    for (int i = 0; i < PIXEL_WIDTH * PIXEL_HEIGHT * 3; i++) {
+        imageFile << (int)packed_pixels[i] << '\t';
+    }
+    imageFile.close();
 
     return 0;
 }
