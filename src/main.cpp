@@ -28,9 +28,6 @@ int main(int argc, char* argv[]) {
     world->addLight(new DirectionalLight(glm::dvec3(0, 1, -1), glm::dvec3(1, 1, 1)));
     uint8_t packed_pixels [PIXEL_WIDTH * PIXEL_HEIGHT * 3];
 
-    Plane* testPlane = new Plane(glm::dvec3(0, 0, -2.5), glm::dvec3(0, 0, 1));
-    world->addObject((Object*)testPlane);
-
     for (int xPixel = 0; xPixel < PIXEL_WIDTH; xPixel++) {
         for (int yPixel = 0; yPixel < PIXEL_HEIGHT; yPixel++) {
             //Get U,V coords

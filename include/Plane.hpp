@@ -3,12 +3,13 @@
 
 #include "Object.hpp"
 
-class Plane : Object {
+class Plane : public Object {
 public:
     enum PLANE_PROPERTIES {
         NONE,
         Q,
-        N
+        N,
+        MATERIAL
     };
 
     Plane(glm::dvec3 q, glm::dvec3 n):

@@ -1,11 +1,12 @@
 #ifndef PARSER_HPP
 #define PARSER_HPP
 
-#include "Camera.hpp"
-#include "Sphere.hpp"
-#include "World.hpp"
 #include <string>
 #include <glm/glm.hpp>
+#include "World.hpp"
+#include "Camera.hpp"
+#include "Sphere.hpp"
+#include "Plane.hpp"
 
 struct FileNotFoundException : public std::exception
 {
@@ -18,7 +19,8 @@ struct FileNotFoundException : public std::exception
 enum OBJECT {
     NONE,
     CAMERA,
-    SPHERE
+    SPHERE,
+    PLANE
 };
 
 class Parser {
@@ -40,6 +42,7 @@ private:
     //Object Parsing
     Camera* parseCamera(std::string data);
     Sphere* parseSphere(std::string data);
+    Plane* parsePlane(std::string data);
 
     //Property Parsing
     glm::dvec3 parseVector(std::string data);

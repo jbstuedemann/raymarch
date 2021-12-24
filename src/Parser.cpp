@@ -58,6 +58,10 @@ void Parser::parseFileData() {
                     if (VERBOSE) std::cout << "Sphere:" << std::endl;
                     lastObject = SPHERE;
                 }
+                else if (identifier == "plane") {
+                    if (VERBOSE) std::cout << "Plane:" << std::endl;
+                    lastObject = PLANE;
+                }
                 else {
                     lastObject = NONE;
                 }
@@ -72,6 +76,9 @@ void Parser::parseFileData() {
                         break;
                     case SPHERE:
                         world->addObject((Object*)parseSphere(data));
+                        break;
+                    case PLANE:
+                        world->addObject((Object*)parsePlane(data));
                         break;
                 }
                 lastObject = NONE;
@@ -194,6 +201,58 @@ Sphere* Parser::parseSphere(std::string data) {
         }
     }
     return outSphere;
+}
+
+Plane* Parser::parsePlane(std::string data) {
+    Plane* outPlane = new Plane();
+    int segmentCount = 0;
+    Plane::PLANE_PROPERTIES lastProperty = Plane::NONE;
+    for (int i = 0; i < data.size(); i++) {
+        switch (data[i]) {
+            case ':': {
+                std::string identifier = data.substr(i-segmentCount, segmentCount);
+                if (identifier == "q") {
+                    if (VERBOSE) std::cout << "\tq -> " << std::endl;
+                    lastProperty = Plane::Q;
+                }
+                else if (identifier == "n") {
+                    if (VERBOSE) std::cout << "\tn -> " << std::endl;
+                    lastProperty = Plane::N;
+                }
+                else if (identifier == "material") {
+                    if (VERBOSE) std::cout << "\tmaterial * " << std::endl;
+                    lastProperty = Plane::MATERIAL;
+                }
+                else {
+                    lastProperty = Plane::NONE;
+                }
+                segmentCount = 0;
+                break;
+            }
+            case ';': {
+                std::string propertyData = data.substr(i-segmentCount, segmentCount);
+                if (VERBOSE) std::cout << "\t\t" << propertyData << std::endl;
+                switch (lastProperty) {
+                    case Plane::Q:
+                        outPlane->setQ(parseVector(propertyData));
+                        break;
+                    case Plane::N:
+                        outPlane->setN(parseVector(propertyData));
+                        break;
+                    case Plane::MATERIAL:
+                        outPlane->setMaterial(parseMaterial(propertyData));
+                        break;
+                }
+                lastProperty = Plane::NONE;
+                segmentCount = 0;
+                break;
+            }
+            default: {
+                segmentCount++;
+            }
+        }
+    }
+    return outPlane;
 }
 
 glm::dvec3 Parser::parseVector(std::string data) {
