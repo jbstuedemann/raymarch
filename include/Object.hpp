@@ -8,9 +8,10 @@ class Object {
 public:
     Object() {
         material = Material{
-            glm::dvec3(1, 1, 1),
-            glm::dvec3(1, 1, 1),
-            glm::dvec3(0, 0, 0)
+            glm::dvec3(0, 0, .5),
+            glm::dvec3(1, .5, 1),
+            glm::dvec3(.5, .5, .5),
+            10
         };
     }
 

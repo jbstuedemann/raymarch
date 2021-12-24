@@ -25,7 +25,7 @@ int main(int argc, char* argv[]) {
 
 
     World* world = parser->getWorld();
-    world->addLight(new DirectionalLight(glm::dvec3(0, 1, -1), glm::dvec3(1, 0, 1)));
+    world->addLight(new DirectionalLight(glm::dvec3(0, 1, -1), glm::dvec3(1, 1, 1)));
     uint8_t packed_pixels [PIXEL_WIDTH * PIXEL_HEIGHT * 3];
 
     for (int xPixel = 0; xPixel < PIXEL_WIDTH; xPixel++) {
@@ -39,8 +39,7 @@ int main(int argc, char* argv[]) {
             world->castRay(ray);
             glm::dvec3 color = glm::dvec3(0, 0, 0);
             if (ray.objectHit) {
-                glm::dvec3 intersectPos = ray.intersectPos();
-                color = world->getShading(ray.objectHit, intersectPos);
+                color = world->getShading(ray);
             }
 
             //int pixelIndex = xPixel*PIXEL_HEIGHT + yPixel;

@@ -16,7 +16,7 @@ public:
     Camera* getCamera() { return camera; }
 
     void castRay(Ray &ray);
-    glm::dvec3 getShading(Object* object, glm::dvec3 position);
+    glm::dvec3 getShading(Ray ray);
 
 private:
     std::vector<Object*> objects;

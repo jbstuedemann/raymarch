@@ -8,6 +8,7 @@ struct Material {
     glm::dvec3 ambient;
     glm::dvec3 diffuse;
     glm::dvec3 specular;
+    double shinyness;
 
 };
 

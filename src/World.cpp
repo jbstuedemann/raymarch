@@ -54,14 +54,36 @@ void World::castRay(Ray &ray) {
     }
 }
 
-glm::dvec3 World::getShading(Object* object, glm::dvec3 position) {
+glm::dvec3 World::getShading(Ray ray) {
+    Object* object = ray.objectHit;
+    glm::dvec3 position = ray.intersectPos();
     glm::dvec3 surfaceNorm = object->getSurfaceNormal(position);
-    glm::dvec3 totalShading = glm::dvec3(0, 0, 0);
+
+    //Ambient Shading
+    glm::dvec3 ambientShading = glm::dvec3(0, 0, 0);
+    for (Light* light : lights) {
+        ambientShading += object->getMaterial().ambient*light->getIntensity();
+    }
+    ambientShading *= (1./lights.size());
+
+    //Diffuse Shading
+    glm::dvec3 diffuseShading = glm::dvec3(0, 0, 0);
     for (Light* light : lights) {
         glm::dvec3 lightDirection = light->getDirectionTo(position);
-        totalShading = 
-            totalShading*(1./2) + 
-            ((glm::dot(surfaceNorm, -lightDirection))*(light->getIntensity() * object->getMaterial().diffuse))*(1./2);
+        diffuseShading += glm::max(glm::dot(surfaceNorm, -lightDirection),0.)*(object->getMaterial().diffuse)*light->getIntensity();
     }
-    return glm::clamp(totalShading, glm::dvec3(0, 0, 0), glm::dvec3(1, 1, 1));
+    diffuseShading *= (1./lights.size());
+
+    //Specular Shading
+    glm::dvec3 specularShading = glm::dvec3(0, 0, 0);
+    for (Light* light : lights) {
+        glm::dvec3 lightDirection = light->getDirectionTo(position);
+        glm::dvec3 lightReflect = glm::reflect(lightDirection, surfaceNorm);
+        double specularScalar = glm::pow(glm::max(glm::dot(-ray.direction, lightReflect), 0.), object->getMaterial().shinyness);
+        specularShading += specularScalar*(object->getMaterial().specular)*light->getIntensity();
+    }
+    specularShading *= (1./lights.size());
+
+    return glm::clamp((ambientShading+diffuseShading+specularShading)*(1./3.), glm::dvec3(0, 0, 0), glm::dvec3(1, 1, 1));
+    // return glm::clamp((specularShading), glm::dvec3(0, 0, 0), glm::dvec3(1, 1, 1));
 }
