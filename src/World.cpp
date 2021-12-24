@@ -26,7 +26,7 @@ void World::addLight(Light* light) {
 
 void World::castRay(Ray &ray) {
     glm::dvec3 currentLocation = ray.position;
-    while (true) {
+    for (int n = 0; n < 1024; n++) {
         // double smallestDistance = getShortestDistance(currentLocation);
         double smallestDistance = DBL_MAX;
         Object* closestObject = nullptr;

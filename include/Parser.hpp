@@ -23,13 +23,15 @@ enum OBJECT {
 
 class Parser {
 public:
-    Parser(std::string filename);
+    Parser(std::string filename, bool VERBOSE=false);
 
     World* getWorld() { return world; }
 
 private:
     std::string filedata;
     World* world;
+
+    const bool VERBOSE = false;
 
     //File Parsing
     void parseLine(std::string line);
@@ -42,6 +44,7 @@ private:
     //Property Parsing
     glm::dvec3 parseVector(std::string data);
     double parseDouble(std::string data) { return std::stod(data); }
+    Material parseMaterial(std::string data);
 };
 
 #endif

@@ -7,13 +7,14 @@
 #include "Sphere.hpp"
 #include "Object.hpp"
 
-Parser::Parser(std::string filename) {
+Parser::Parser(std::string filename, bool VERBOSE): VERBOSE(VERBOSE) {
     std::ifstream inputFile;
     inputFile.open(filename);
 
     if (inputFile) {
 
-        std::cout << "Loading World..." << std::endl << std::endl;
+        if (VERBOSE) std::cout << "Loading World..." << std::endl << std::endl;
+
         world = new World();
 
         std::string line;
@@ -23,7 +24,7 @@ Parser::Parser(std::string filename) {
         
         parseFileData();
 
-        std::cout << std::endl << "Parsing done" << std::endl;
+        if (VERBOSE) std::cout << std::endl << "Parsing done" << std::endl;
 
         inputFile.close();
     }
@@ -50,11 +51,11 @@ void Parser::parseFileData() {
             case '{': {
                 std::string identifier = filedata.substr(i-segmentCount, segmentCount);
                 if (identifier == "camera") {
-                    std::cout << "Camera:" << std::endl;
+                    if (VERBOSE) std::cout << "Camera:" << std::endl;
                     lastObject = CAMERA;
                 }
                 else if (identifier == "sphere") {
-                    std::cout << "Sphere:" << std::endl;
+                    if (VERBOSE) std::cout << "Sphere:" << std::endl;
                     lastObject = SPHERE;
                 }
                 else {
@@ -93,19 +94,19 @@ Camera* Parser::parseCamera(std::string data) {
             case ':': {
                 std::string identifier = data.substr(i-segmentCount, segmentCount);
                 if (identifier == "position") {
-                    std::cout << "\tposition -> " << std::endl;
+                    if (VERBOSE) std::cout << "\tposition -> " << std::endl;
                     lastProperty = Camera::POSITION;
                 }
                 else if (identifier == "up") {
-                    std::cout << "\tup -> " << std::endl;
+                    if (VERBOSE) std::cout << "\tup -> " << std::endl;
                     lastProperty = Camera::UP;
                 }
                 else if (identifier == "forward") {
-                    std::cout << "\tforward -> " << std::endl;
+                    if (VERBOSE) std::cout << "\tforward -> " << std::endl;
                     lastProperty = Camera::FORWARD;
                 }
                 else if (identifier == "fov") {
-                    std::cout << "\tfov # " << std::endl;
+                    if (VERBOSE) std::cout << "\tfov # " << std::endl;
                     lastProperty = Camera::FOV;
                 }
                 else {
@@ -116,7 +117,7 @@ Camera* Parser::parseCamera(std::string data) {
             }
             case ';': {
                 std::string propertyData = data.substr(i-segmentCount, segmentCount);
-                std::cout << "\t\t" << propertyData << std::endl;
+                if (VERBOSE) std::cout << "\t\t" << propertyData << std::endl;
                 switch (lastProperty) {
                     case Camera::POSITION:
                         outCamera->setPosition(parseVector(propertyData));
@@ -152,12 +153,16 @@ Sphere* Parser::parseSphere(std::string data) {
             case ':': {
                 std::string identifier = data.substr(i-segmentCount, segmentCount);
                 if (identifier == "center") {
-                    std::cout << "\tcenter -> " << std::endl;
+                    if (VERBOSE) std::cout << "\tcenter -> " << std::endl;
                     lastProperty = Sphere::CENTER;
                 }
                 else if (identifier == "radius") {
-                    std::cout << "\tradius # " << std::endl;
+                    if (VERBOSE) std::cout << "\tradius # " << std::endl;
                     lastProperty = Sphere::RADIUS;
+                }
+                else if (identifier == "material") {
+                    if (VERBOSE) std::cout << "\tmaterial * " << std::endl;
+                    lastProperty = Sphere::MATERIAL;
                 }
                 else {
                     lastProperty = Sphere::NONE;
@@ -167,13 +172,16 @@ Sphere* Parser::parseSphere(std::string data) {
             }
             case ';': {
                 std::string propertyData = data.substr(i-segmentCount, segmentCount);
-                std::cout << "\t\t" << propertyData << std::endl;
+                if (VERBOSE) std::cout << "\t\t" << propertyData << std::endl;
                 switch (lastProperty) {
                     case Sphere::CENTER:
                         outSphere->setCenter(parseVector(propertyData));
                         break;
                     case Sphere::RADIUS:
                         outSphere->setRadius(parseDouble(propertyData));
+                        break;
+                    case Sphere::MATERIAL:
+                        outSphere->setMaterial(parseMaterial(propertyData));
                         break;
                 }
                 lastProperty = Sphere::NONE;
@@ -205,4 +213,36 @@ glm::dvec3 Parser::parseVector(std::string data) {
         }
     }
     return glm::dvec3(vector[0], vector[1], vector[2]);
+}
+
+Material Parser::parseMaterial(std::string data) {
+    Material newMaterial {glm::dvec3(0, 0, 0), glm::dvec3(0, 0, 0), glm::dvec3(0, 0, 0), 0};
+    int counter = 0;
+    int dataCount = 0;
+    if (data[0] == '[') {
+        for (int i = 1; i < data.size(); i++) {
+            if (data[i] == '>'|| data[i] == ']') {
+                dataCount++;
+                i++;
+                if (counter == 0 ){
+                    newMaterial.ambient = parseVector(data.substr(i-dataCount, dataCount));
+                }
+                else if (counter == 1) {
+                    newMaterial.diffuse = parseVector(data.substr(i-dataCount, dataCount));
+                }
+                else if (counter == 2) {
+                    newMaterial.specular = parseVector(data.substr(i-dataCount, dataCount));
+                }
+                else if (counter == 3) {
+                    newMaterial.shinyness = parseDouble(data.substr(i-dataCount, dataCount-1));
+                }
+                counter++;
+                dataCount = 0;
+            }
+            else {
+                dataCount++;
+            }
+        }
+    }
+    return newMaterial;
 }

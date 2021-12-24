@@ -19,15 +19,21 @@ public:
         glm::dvec3 up,
         glm::dvec3 forward,
         double fov
-    ):position(position),up(up),forward(forward),fov(fov){
-        right = glm::normalize(glm::cross(up, forward));
+    ):
+        position(position),
+        up(glm::normalize(up)),
+        forward(glm::normalize(forward)),
+        fov(fov)
+        {
+        right = glm::normalize(glm::cross(forward, up));
+        up = glm::normalize(glm::cross(right, forward));
     };
 
     Camera(){
         position = glm::dvec3(0, 0, 0);
         up = glm::dvec3(0, 0, 1);
         forward = glm::dvec3(0, 1, 0);
-        right = glm::normalize(glm::cross(up, forward));
+        right = glm::normalize(glm::cross(forward, up));
         fov = 90;
     };
 
@@ -36,13 +42,15 @@ public:
     }
 
     void setUp(glm::dvec3 newUp) {
-        up = newUp;
-        right = glm::normalize(glm::cross(up, forward));
+        up = glm::normalize(newUp);
+        right = glm::normalize(glm::cross(forward, up));
+        forward = glm::normalize(glm::cross(up, right));
     }
 
     void setForward(glm::dvec3 newForward) {
-        forward = newForward;
-        right = glm::normalize(glm::cross(up, forward));
+        forward = glm::normalize(newForward);
+        right = glm::normalize(glm::cross(forward, up));
+        up = glm::normalize(glm::cross(right, forward));
     }
 
     void setFov(double newFov) {

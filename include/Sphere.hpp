@@ -9,13 +9,15 @@ public:
     enum SPHERE_PROPERTIES {
         NONE,
         CENTER,
-        RADIUS
+        RADIUS,
+        MATERIAL
     };
 
-    Sphere(
-        glm::dvec3 center,
-        double radius
-    ):Object(),center(center),radius(radius){};
+    Sphere(glm::dvec3 center, double radius):
+        Object(),
+        center(center),
+        radius(radius)
+    {};
 
     Sphere():Object(){
         center = glm::dvec3(0, 0, 0);

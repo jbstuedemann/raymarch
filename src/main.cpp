@@ -5,6 +5,7 @@
 #include "Ray.hpp"
 
 #include "DirectionalLight.hpp"
+#include "Plane.hpp"
 
 const int PIXEL_WIDTH = 1920;
 const int PIXEL_HEIGHT = 1080;
@@ -16,17 +17,19 @@ int main(int argc, char* argv[]) {
     Parser* parser;
 
     try {
-        parser = new Parser("../tests/Test1.scene");
+        parser = new Parser("../tests/Test1.scene", true);
     }
     catch (std::exception &ex) {
         std::cout << ex.what() << std::endl;
         return 1;
     }
 
-
     World* world = parser->getWorld();
     world->addLight(new DirectionalLight(glm::dvec3(0, 1, -1), glm::dvec3(1, 1, 1)));
     uint8_t packed_pixels [PIXEL_WIDTH * PIXEL_HEIGHT * 3];
+
+    Plane* testPlane = new Plane(glm::dvec3(0, 0, -2.5), glm::dvec3(0, 0, 1));
+    world->addObject((Object*)testPlane);
 
     for (int xPixel = 0; xPixel < PIXEL_WIDTH; xPixel++) {
         for (int yPixel = 0; yPixel < PIXEL_HEIGHT; yPixel++) {
@@ -43,7 +46,7 @@ int main(int argc, char* argv[]) {
             }
 
             //int pixelIndex = xPixel*PIXEL_HEIGHT + yPixel;
-            int pixelIndex = ((PIXEL_HEIGHT-yPixel-1)*PIXEL_WIDTH + xPixel)*3;
+            int pixelIndex = ((yPixel)*PIXEL_WIDTH + xPixel)*3;
             packed_pixels[pixelIndex] = (uint8_t)(color.x * 255);
             packed_pixels[pixelIndex+1] = (uint8_t)(color.y * 255);
             packed_pixels[pixelIndex+2] = (uint8_t)(color.z * 255);
