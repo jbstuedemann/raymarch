@@ -7,6 +7,8 @@
 #include "Camera.hpp"
 #include "Sphere.hpp"
 #include "Plane.hpp"
+#include "PointLight.hpp"
+#include "DirectionalLight.hpp"
 
 struct FileNotFoundException : public std::exception
 {
@@ -20,7 +22,9 @@ enum OBJECT {
     NONE,
     CAMERA,
     SPHERE,
-    PLANE
+    PLANE,
+    POINTLIGHT,
+    DIRECTIONALLIGHT
 };
 
 class Parser {
@@ -43,6 +47,10 @@ private:
     Camera* parseCamera(std::string data);
     Sphere* parseSphere(std::string data);
     Plane* parsePlane(std::string data);
+
+    //Lght Parsing
+    PointLight* parsePointLight(std::string data);
+    DirectionalLight* parseDirectionalLight(std::string data);
 
     //Property Parsing
     glm::dvec3 parseVector(std::string data);

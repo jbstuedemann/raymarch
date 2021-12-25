@@ -16,12 +16,12 @@ public:
     Camera* getCamera() { return camera; }
 
     void castRay(Ray &ray);
+    void castRay(Ray &ray, Object* ignoreObject);
     glm::dvec3 getShading(Ray ray);
 
 private:
     std::vector<Object*> objects;
     std::vector<Light*> lights;
-    // double getShortestDistance(glm::dvec3 position);
     Camera* camera;
 };
 

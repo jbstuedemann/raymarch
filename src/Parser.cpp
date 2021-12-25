@@ -3,9 +3,14 @@
 #include <fstream>
 #include <iostream>
 #include <cctype>
+#include "World.hpp"
 #include "Camera.hpp"
 #include "Sphere.hpp"
+#include "Plane.hpp"
 #include "Object.hpp"
+#include "Light.hpp"
+#include "PointLight.hpp"
+#include "DirectionalLight.hpp"
 
 Parser::Parser(std::string filename, bool VERBOSE): VERBOSE(VERBOSE) {
     std::ifstream inputFile;
@@ -62,6 +67,14 @@ void Parser::parseFileData() {
                     if (VERBOSE) std::cout << "Plane:" << std::endl;
                     lastObject = PLANE;
                 }
+                else if (identifier == "point_light") {
+                    if (VERBOSE) std::cout << "Point Light:" << std::endl;
+                    lastObject = POINTLIGHT;
+                }
+                else if (identifier == "directional_light") {
+                    if (VERBOSE) std::cout << "Directional Light:" << std::endl;
+                    lastObject = DIRECTIONALLIGHT;
+                }
                 else {
                     lastObject = NONE;
                 }
@@ -79,6 +92,12 @@ void Parser::parseFileData() {
                         break;
                     case PLANE:
                         world->addObject((Object*)parsePlane(data));
+                        break;
+                    case POINTLIGHT:
+                        world->addLight((Light*)parsePointLight(data));
+                        break;
+                    case DIRECTIONALLIGHT:
+                        world->addLight((Light*)parseDirectionalLight(data));
                         break;
                 }
                 lastObject = NONE;
@@ -253,6 +272,96 @@ Plane* Parser::parsePlane(std::string data) {
         }
     }
     return outPlane;
+}
+
+PointLight* Parser::parsePointLight(std::string data) {
+    PointLight* outPointLight = new PointLight();
+    int segmentCount = 0;
+    PointLight::POINTLIGHT_PROPERTIES lastProperty = PointLight::NONE;
+    for (int i = 0; i < data.size(); i++) {
+        switch (data[i]) {
+            case ':': {
+                std::string identifier = data.substr(i-segmentCount, segmentCount);
+                if (identifier == "position") {
+                    if (VERBOSE) std::cout << "\tposition -> " << std::endl;
+                    lastProperty = PointLight::POSITION;
+                }
+                else if (identifier == "intensity") {
+                    if (VERBOSE) std::cout << "\tintensity -> " << std::endl;
+                    lastProperty = PointLight::INTENSITY;
+                }
+                else {
+                    lastProperty = PointLight::NONE;
+                }
+                segmentCount = 0;
+                break;
+            }
+            case ';': {
+                std::string propertyData = data.substr(i-segmentCount, segmentCount);
+                if (VERBOSE) std::cout << "\t\t" << propertyData << std::endl;
+                switch (lastProperty) {
+                    case PointLight::POSITION:
+                        outPointLight->setPosition(parseVector(propertyData));
+                        break;
+                    case PointLight::INTENSITY:
+                        outPointLight->setIntensity(parseVector(propertyData));
+                        break;
+                }
+                lastProperty = PointLight::NONE;
+                segmentCount = 0;
+                break;
+            }
+            default: {
+                segmentCount++;
+            }
+        }
+    }
+    return outPointLight;
+}
+
+DirectionalLight* Parser::parseDirectionalLight(std::string data) {
+    DirectionalLight* outDirectionalLight = new DirectionalLight();
+    int segmentCount = 0;
+    DirectionalLight::DIRECTIONALLIGHT_PROPERTIES lastProperty = DirectionalLight::NONE;
+    for (int i = 0; i < data.size(); i++) {
+        switch (data[i]) {
+            case ':': {
+                std::string identifier = data.substr(i-segmentCount, segmentCount);
+                if (identifier == "direction") {
+                    if (VERBOSE) std::cout << "\tdirection -> " << std::endl;
+                    lastProperty = DirectionalLight::DIRECTION;
+                }
+                else if (identifier == "intensity") {
+                    if (VERBOSE) std::cout << "\tintensity -> " << std::endl;
+                    lastProperty = DirectionalLight::INTENSITY;
+                }
+                else {
+                    lastProperty = DirectionalLight::NONE;
+                }
+                segmentCount = 0;
+                break;
+            }
+            case ';': {
+                std::string propertyData = data.substr(i-segmentCount, segmentCount);
+                if (VERBOSE) std::cout << "\t\t" << propertyData << std::endl;
+                switch (lastProperty) {
+                    case DirectionalLight::DIRECTION:
+                        outDirectionalLight->setDirection(parseVector(propertyData));
+                        break;
+                    case DirectionalLight::INTENSITY:
+                        outDirectionalLight->setIntensity(parseVector(propertyData));
+                        break;
+                }
+                lastProperty = DirectionalLight::NONE;
+                segmentCount = 0;
+                break;
+            }
+            default: {
+                segmentCount++;
+            }
+        }
+    }
+    return outDirectionalLight;
 }
 
 glm::dvec3 Parser::parseVector(std::string data) {
